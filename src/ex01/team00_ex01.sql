@@ -21,8 +21,7 @@ WITH RECURSIVE tours AS (
   WHERE 
     nodes.point2 NOT IN (SELECT unnest(tours.cities_visited)) AND
     ARRAY_LENGTH(tours.cities_visited, 1) < 4
-)
-, final_tours AS (
+), all_tours AS (
   SELECT 
     tours.total_cost + nodes.cost AS total_cost,
     CASE 
@@ -33,9 +32,9 @@ WITH RECURSIVE tours AS (
   JOIN nodes ON tours.current_city = nodes.point1 AND nodes.point2 = tours.start_city
   WHERE ARRAY_LENGTH(tours.cities_visited, 1) = 4
 )
-SELECT * FROM final_tours
-WHERE total_cost = (SELECT MIN(total_cost) FROM final_tours)
+SELECT * FROM all_tours
+WHERE total_cost = (SELECT MIN(total_cost) FROM all_tours)
 UNION ALL
-SELECT * FROM final_tours
-WHERE total_cost = (SELECT MAX(total_cost) FROM final_tours)
+SELECT * FROM all_tours
+WHERE total_cost = (SELECT MAX(total_cost) FROM all_tours)
 ORDER BY total_cost, tour;
